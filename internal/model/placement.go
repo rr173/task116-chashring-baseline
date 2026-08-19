@@ -24,7 +24,7 @@ func Capacity(n Node) int {
 	}
 	virtual := n.VirtualNodes
 	if virtual <= 0 {
-		virtual = 1
+		virtual = 100
 	}
 	return weight * virtual
 }

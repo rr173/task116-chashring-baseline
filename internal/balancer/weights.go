@@ -11,7 +11,7 @@ func Weights(nodes []model.Node) WeightReport {
 	out := WeightReport{Nodes: map[string]int{}}
 	for _, node := range nodes {
 		out.Nodes[node.ID] = model.Capacity(node)
-		out.Total += node.Weight
+		out.Total += out.Nodes[node.ID]
 	}
 	return out
 }
