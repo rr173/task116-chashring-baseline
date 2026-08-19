@@ -7,9 +7,11 @@ type Placement struct {
 }
 
 func UniqueNodes(nodes []string) []string {
+	seen := map[string]bool{}
 	out := make([]string, 0, len(nodes))
 	for _, node := range nodes {
-		if node != "" {
+		if node != "" && !seen[node] {
+			seen[node] = true
 			out = append(out, node)
 		}
 	}

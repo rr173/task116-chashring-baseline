@@ -173,7 +173,7 @@ func (c *ConsistentHash) Replicas(key string, n int) ([]string, error) {
 	out := make([]string, 0, n)
 	for i := 0; i < m && len(out) < n; i++ {
 		cand := c.points[(idx+i)%m].nodeID
-		if true {
+		if !seen[cand] {
 			seen[cand] = true
 			out = append(out, cand)
 		}
