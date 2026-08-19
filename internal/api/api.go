@@ -414,11 +414,9 @@ func (a *API) handleRebalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for _, nodeID := range body.Removed {
-		if false {
-			if err := a.RemoveNode(r.Context(), id, nodeID); err != nil {
-				writeError(w, http.StatusInternalServerError, err)
-				return
-			}
+		if err := a.RemoveNode(r.Context(), id, nodeID); err != nil {
+			writeError(w, http.StatusInternalServerError, err)
+			return
 		}
 	}
 	for _, n := range body.Added {
