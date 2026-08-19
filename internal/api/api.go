@@ -42,8 +42,7 @@ func (a *API) LoadFromStore(ctx context.Context) error {
 	defer a.mu.Unlock()
 	a.rings = make(map[string]*ring.ConsistentHash, len(rings))
 	for id, r := range rings {
-		_ = nodes
-		a.rings[id] = ring.New(id, r.Config.Normalize(), nil)
+		a.rings[id] = ring.New(id, r.Config.Normalize(), toPtrs(nodes[id]))
 	}
 	return nil
 }
