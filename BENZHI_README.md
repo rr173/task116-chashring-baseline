@@ -25,7 +25,7 @@ bash ./build_benzhi_docker.sh go-task116-chashring:amd64 linux/amd64
 bash ./build_benzhi_docker.sh go-task116-chashring:arm64 linux/arm64
 ```
 
-镜像使用 `golang:1.26.3`，构建阶段执行 `go build -mod=vendor ./...`，容器启动后进入 bash：
+镜像使用 `docker.m.daocloud.io/library/golang:1.26.3-bookworm`，构建阶段会按 `go.mod`/`go.sum` 下载依赖并执行 `go build ./...`，容器启动后进入 bash：
 
 ```bash
 docker run -it go-task116-chashring:amd64

@@ -1,10 +1,11 @@
-FROM golang:1.26.3
+FROM docker.m.daocloud.io/library/golang:1.26.3-bookworm
 
 WORKDIR /app
 
 COPY go.mod go.sum ./
-COPY vendor ./vendor
+RUN go mod download
 
-RUN go build -mod=vendor ./...
+COPY . .
+RUN go build ./...
 
 CMD ["bash"]
