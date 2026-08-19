@@ -1,9 +1,16 @@
 package model
 
+import "strings"
+
 func NormalizeKeys(keys []string) []string {
 	out := make([]string, 0, len(keys))
+	seen := map[string]bool{}
 	for _, key := range keys {
-		out = append(out, key)
+		key = strings.TrimSpace(key)
+		if key != "" && !seen[key] {
+			seen[key] = true
+			out = append(out, key)
+		}
 	}
 	return out
 }
