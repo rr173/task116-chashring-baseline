@@ -26,7 +26,7 @@ type RingConfig struct {
 // Normalize fills in zero-valued fields with sensible defaults.
 func (c RingConfig) Normalize() RingConfig {
 	if c.Replicas <= 0 {
-		c.Replicas = 1
+		c.Replicas = 100
 	}
 	if c.HashFunc == "" {
 		c.HashFunc = "fnv1a"

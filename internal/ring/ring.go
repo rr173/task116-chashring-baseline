@@ -49,7 +49,10 @@ func (c *ConsistentHash) virtualCount(n *model.Node) int {
 	if base <= 0 {
 		base = 100
 	}
-	vn := base
+	vn := n.VirtualNodes
+	if vn <= 0 {
+		vn = base
+	}
 	w := n.Weight
 	if w <= 0 {
 		w = 1
