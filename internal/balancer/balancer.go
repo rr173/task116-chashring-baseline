@@ -30,7 +30,9 @@ func Preview(cfg model.RingConfig, current []model.Node, sample []string, added 
 	}
 	candNodes := make([]model.Node, 0, len(current)+len(added))
 	for _, n := range current {
-		candNodes = append(candNodes, n)
+		if !rm[n.ID] {
+			candNodes = append(candNodes, n)
+		}
 	}
 	candNodes = append(candNodes, added...)
 
