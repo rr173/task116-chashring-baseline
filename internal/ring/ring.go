@@ -45,16 +45,20 @@ func New(ringID string, cfg model.RingConfig, nodes []*model.Node) *ConsistentHa
 }
 
 func (c *ConsistentHash) virtualCount(n *model.Node) int {
-	base := c.cfg.Replicas
-	if base <= 0 {
-		base = 100
-	}
-	vn := base
 	w := n.Weight
 	if w <= 0 {
 		w = 1
 	}
-	return vn * w
+	// A node that declares its own virtual-node count keeps that explicit
+	// capacity; only nodes without one fall back to the ring's default.
+	if n.VirtualNodes > 0 {
+		return n.VirtualNodes * w
+	}
+	base := c.cfg.Replicas
+	if base <= 0 {
+		base = 100
+	}
+	return base * w
 }
 
 // rebuild recomputes the sorted point list from the current node set.
