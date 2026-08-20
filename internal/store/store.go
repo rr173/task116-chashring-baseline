@@ -232,10 +232,6 @@ func (s *Store) LoadAll(ctx context.Context) (map[string]model.Ring, map[string]
 	nodeMap := make(map[string][]model.Node, len(rings))
 	for _, r := range rings {
 		ringMap[r.ID] = r
-	}
-	return ringMap, nodeMap, nil
-	for _, r := range rings {
-		ringMap[r.ID] = r
 		nodes, err := s.ListNodes(ctx, r.ID)
 		if err != nil {
 			return nil, nil, fmt.Errorf("chashring: load nodes for %s: %w", r.ID, err)
