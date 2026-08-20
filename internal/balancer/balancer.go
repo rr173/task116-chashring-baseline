@@ -40,7 +40,7 @@ func Preview(cfg model.RingConfig, current []model.Node, sample []string, added 
 	cand := ring.New("preview", cfg, toPtrs(candNodes))
 
 	plan := Plan{Added: added, Removed: removed}
-	for _, key := range sample {
+	for _, key := range model.NormalizeKeys(sample) {
 		before, _ := base.Lookup(key)
 		after, _ := cand.Lookup(key)
 		if before != after {

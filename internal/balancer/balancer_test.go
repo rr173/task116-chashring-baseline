@@ -36,3 +36,24 @@ func TestPreviewWithAdd(t *testing.T) {
 		t.Fatalf("added not recorded")
 	}
 }
+
+// TestPreviewDeduplicatesKeys verifies that duplicate, whitespace-padded, and
+// blank sample keys collapse to a single move per meaningful key. Node "a" is
+// removed while "b" is added, so every surviving key moves a→b deterministically.
+func TestPreviewDeduplicatesKeys(t *testing.T) {
+	cfg := model.RingConfig{Replicas: 20, Replication: 2}
+	current := []model.Node{{ID: "a", Weight: 1, VirtualNodes: 20}}
+	added := []model.Node{{ID: "b", Weight: 1, VirtualNodes: 20}}
+	removed := []string{"a"}
+	sample := []string{"alpha", " alpha ", "", "alpha", "\t"}
+	plan := Preview(cfg, current, sample, added, removed)
+	if plan.Count != 1 {
+		t.Fatalf("expected one move, got %d (%#v)", plan.Count, plan.Moves)
+	}
+	if plan.Moves[0].Key != "alpha" {
+		t.Fatalf("expected move for alpha, got %q", plan.Moves[0].Key)
+	}
+	if plan.Moves[0].From != "a" || plan.Moves[0].To != "b" {
+		t.Fatalf("unexpected move: %+v", plan.Moves[0])
+	}
+}

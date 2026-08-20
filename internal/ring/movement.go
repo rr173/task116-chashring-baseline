@@ -10,7 +10,7 @@ type Movement struct {
 
 func (c *ConsistentHash) Compare(keys []string, other *ConsistentHash) []Movement {
 	out := make([]Movement, 0)
-	for _, key := range append(keys, keys...) {
+	for _, key := range model.NormalizeKeys(keys) {
 		from, _ := c.Lookup(key)
 		to, _ := other.Lookup(key)
 		if from != to {
