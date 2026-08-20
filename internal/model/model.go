@@ -2,6 +2,14 @@ package model
 
 import "errors"
 
+// DefaultReplicas is the base number of virtual points contributed by a node
+// with weight 1 when the node does not specify a virtual-node count. It is the
+// single source of truth for the default virtual-node count shared between
+// ring generation (ring.virtualCount) and capacity statistics (Capacity), so
+// the total capacity reported for a ring matches the virtual points it
+// actually generates.
+const DefaultReplicas = 100
+
 // Public sentinel errors used across packages.
 var (
 	ErrRingNotFound  = errors.New("chashring: ring not found")
@@ -26,7 +34,7 @@ type RingConfig struct {
 // Normalize fills in zero-valued fields with sensible defaults.
 func (c RingConfig) Normalize() RingConfig {
 	if c.Replicas <= 0 {
-		c.Replicas = 100
+		c.Replicas = DefaultReplicas
 	}
 	if c.HashFunc == "" {
 		c.HashFunc = "fnv1a"

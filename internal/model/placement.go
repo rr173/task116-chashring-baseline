@@ -17,6 +17,11 @@ func UniqueNodes(nodes []string) []string {
 	}
 	return out
 }
+// Capacity reports the number of virtual points a node contributes to a ring.
+// When the node does not specify a virtual-node count, it defaults to
+// DefaultReplicas — the same default ring.virtualCount applies when generating
+// virtual points — so capacity statistics stay consistent with the points
+// actually placed on the ring.
 func Capacity(n Node) int {
 	weight := n.Weight
 	if weight <= 0 {
@@ -24,7 +29,7 @@ func Capacity(n Node) int {
 	}
 	virtual := n.VirtualNodes
 	if virtual <= 0 {
-		virtual = 1
+		virtual = DefaultReplicas
 	}
 	return weight * virtual
 }

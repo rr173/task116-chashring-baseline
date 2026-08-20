@@ -47,7 +47,7 @@ func New(ringID string, cfg model.RingConfig, nodes []*model.Node) *ConsistentHa
 func (c *ConsistentHash) virtualCount(n *model.Node) int {
 	base := c.cfg.Replicas
 	if base <= 0 {
-		base = 100
+		base = model.DefaultReplicas
 	}
 	vn := n.VirtualNodes
 	if vn <= 0 {
