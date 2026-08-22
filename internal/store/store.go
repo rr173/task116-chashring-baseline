@@ -69,17 +69,20 @@ CREATE TABLE IF NOT EXISTS nodes (
 	return nil
 }
 
-// SaveRing upserts a ring row.
+// SaveRing upserts a ring row. The config is normalized so that defaults
+// applied in memory (e.g. Replicas=100, Replication=2) are persisted as the
+// effective values rather than the raw zero values the caller supplied.
 func (s *Store) SaveRing(ctx context.Context, r model.Ring) error {
 	if r.ID == "" {
 		return model.ErrInvalidConfig
 	}
+	cfg := r.Config.Normalize()
 	_, err := s.db.ExecContext(ctx,
 		`INSERT INTO rings (id,name,replicas,hash_func,replication,created_at,updated_at)
          VALUES (?,?,?,?,?,?,?)
          ON CONFLICT(id) DO UPDATE SET name=excluded.name, replicas=excluded.replicas,
            hash_func=excluded.hash_func, replication=excluded.replication, updated_at=excluded.updated_at`,
-		r.ID, r.Name, 0, r.Config.HashFunc, r.Config.Replication, r.CreatedAt, r.UpdatedAt)
+		r.ID, r.Name, cfg.Replicas, cfg.HashFunc, cfg.Replication, r.CreatedAt, r.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("chashring: save ring: %w", err)
 	}

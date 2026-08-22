@@ -79,18 +79,21 @@ func (a *API) RingView(id string) (model.RingView, error) {
 	return model.RingView{Ring: r, Nodes: rh.Nodes(), Stats: rh.Stats()}, nil
 }
 
-// CreateRing persists and indexes a new ring.
+// CreateRing persists and indexes a new ring. The config is normalized before
+// persistence and in-memory construction so the two stay in sync across a
+// restart.
 func (a *API) CreateRing(ctx context.Context, r model.Ring) error {
 	if err := r.Validate(); err != nil {
 		return err
 	}
+	r.Config = r.Config.Normalize()
 	r.CreatedAt = time.Now().Unix()
 	r.UpdatedAt = r.CreatedAt
 	if err := a.store.SaveRing(ctx, r); err != nil {
 		return err
 	}
 	a.mu.Lock()
-	a.rings[r.ID] = ring.New(r.ID, model.RingConfig{Replicas: 1}, nil)
+	a.rings[r.ID] = ring.New(r.ID, r.Config, nil)
 	a.mu.Unlock()
 	return nil
 }

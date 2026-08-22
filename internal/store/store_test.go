@@ -44,6 +44,46 @@ func TestRingCRUD(t *testing.T) {
 	}
 }
 
+// TestSaveRingPersistsDefaultConfig guards against regressing the bug where
+// SaveRing hardcoded replicas=0 instead of persisting the (normalized) config.
+// A ring created with the default/empty config must round-trip the effective
+// defaults (Replicas=100, Replication=2, HashFunc="fnv1a") so that a restart
+// rebuilds an identical ring and /config reports the correct capacity.
+func TestSaveRingPersistsDefaultConfig(t *testing.T) {
+	ctx := context.Background()
+	st := newTestStore(t)
+	r := model.Ring{ID: "def", Name: "defaults", Config: model.RingConfig{}, CreatedAt: 1, UpdatedAt: 1}
+	if err := st.SaveRing(ctx, r); err != nil {
+		t.Fatal(err)
+	}
+	got, err := st.GetRing(ctx, "def")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Config.Replicas != 100 {
+		t.Fatalf("expected default replicas=100 persisted, got %d", got.Config.Replicas)
+	}
+	if got.Config.Replication != 2 {
+		t.Fatalf("expected default replication=2 persisted, got %d", got.Config.Replication)
+	}
+	if got.Config.HashFunc != "fnv1a" {
+		t.Fatalf("expected default hash_func=fnv1a persisted, got %q", got.Config.HashFunc)
+	}
+
+	// Explicit values must also survive a round-trip.
+	r2 := model.Ring{ID: "exp", Name: "explicit", Config: model.RingConfig{Replicas: 50, Replication: 4}, CreatedAt: 1, UpdatedAt: 1}
+	if err := st.SaveRing(ctx, r2); err != nil {
+		t.Fatal(err)
+	}
+	got2, err := st.GetRing(ctx, "exp")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got2.Config.Replicas != 50 || got2.Config.Replication != 4 {
+		t.Fatalf("explicit config not persisted: %+v", got2.Config)
+	}
+}
+
 func TestNodeDuplicate(t *testing.T) {
 	ctx := context.Background()
 	st := newTestStore(t)
