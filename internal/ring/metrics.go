@@ -11,7 +11,6 @@ type Metrics struct {
 
 func (c *ConsistentHash) Metrics() Metrics {
 	stats := c.Stats()
-	nodes := c.Nodes()
 	balance := 0.0
 	if len(stats.Nodes) > 0 {
 		min, max := 1.0, 0.0
@@ -25,7 +24,7 @@ func (c *ConsistentHash) Metrics() Metrics {
 		}
 		balance = max - min
 	}
-	return Metrics{Nodes: len(stats.Nodes), Points: len(nodes), Capacity: TotalCapacity(nodes), Balance: balance}
+	return Metrics{Nodes: stats.NodeCount, Points: stats.PointCount, Capacity: TotalCapacity(c.Nodes()), Balance: balance}
 }
 
 var _ = model.RingStats{}

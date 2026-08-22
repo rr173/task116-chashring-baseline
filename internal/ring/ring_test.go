@@ -54,11 +54,53 @@ func TestAddRemoveNode(t *testing.T) {
 func TestStatsCounts(t *testing.T) {
 	rh := New("r", model.RingConfig{}, sampleNodes())
 	s := rh.Stats()
+	// NodeCount is the number of distinct physical nodes.
 	if s.NodeCount != 3 {
-		t.Fatalf("expected 3 nodes, got %d", s.NodeCount)
+		t.Fatalf("expected 3 physical nodes, got %d", s.NodeCount)
 	}
-	if s.PointCount == 0 {
-		t.Fatal("expected non-zero point count")
+	// PointCount is the total number of virtual routing points: 3 nodes * 10
+	// virtual nodes each, weight 1.
+	if s.PointCount != 30 {
+		t.Fatalf("expected 30 virtual points, got %d", s.PointCount)
+	}
+	// Each physical node must report its own virtual-point contribution.
+	totalVN := 0
+	for _, nd := range s.Nodes {
+		if nd.VirtualNodes != 10 {
+			t.Fatalf("node %s: expected 10 virtual points, got %d", nd.ID, nd.VirtualNodes)
+		}
+		totalVN += nd.VirtualNodes
+	}
+	if totalVN != s.PointCount {
+		t.Fatalf("per-node virtual points %d must sum to PointCount %d", totalVN, s.PointCount)
+	}
+}
+
+func TestMetricsCounts(t *testing.T) {
+	rh := New("r", model.RingConfig{}, sampleNodes())
+	m := rh.Metrics()
+	if m.Nodes != 3 {
+		t.Fatalf("expected 3 physical nodes, got %d", m.Nodes)
+	}
+	if m.Points != 30 {
+		t.Fatalf("expected 30 virtual points, got %d", m.Points)
+	}
+	if m.Nodes == m.Points {
+		t.Fatal("metrics collapse node and point counts into one number")
+	}
+}
+
+func TestHealthCounts(t *testing.T) {
+	rh := New("r", model.RingConfig{}, sampleNodes())
+	h := rh.Health()
+	if h.Nodes != 3 {
+		t.Fatalf("expected 3 physical nodes, got %d", h.Nodes)
+	}
+	if h.Points != 30 {
+		t.Fatalf("expected 30 virtual points, got %d", h.Points)
+	}
+	if h.Empty {
+		t.Fatal("non-empty ring reported as empty")
 	}
 }
 

@@ -214,9 +214,13 @@ func (c *ConsistentHash) Stats() model.RingStats {
 		}
 		balanced = (maxS - minS) <= 0.25
 	}
+	// NodeCount is the number of distinct physical nodes; PointCount is the
+	// total number of virtual routing points placed on the ring. These must be
+	// tracked separately so monitoring can distinguish real node scale from
+	// routing-point scale.
 	return model.RingStats{
-		NodeCount:  total,
-		PointCount: len(per),
+		NodeCount:  len(per),
+		PointCount: total,
 		Balanced:   balanced,
 		Nodes:      nodes,
 	}
