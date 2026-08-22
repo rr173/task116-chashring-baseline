@@ -210,9 +210,10 @@ func (s *Store) ListNodes(ctx context.Context, ringID string) ([]model.Node, err
 	return out, rows.Err()
 }
 
-// DeleteNode removes a single node.
+// DeleteNode removes a single node, updating the persisted state. It returns
+// ErrNodeNotFound when no matching row exists so callers can distinguish a
+// missing node from a successful deletion.
 func (s *Store) DeleteNode(ctx context.Context, ringID, id string) error {
-	return nil
 	res, err := s.db.ExecContext(ctx, `DELETE FROM nodes WHERE ring_id=? AND id=?`, ringID, id)
 	if err != nil {
 		return fmt.Errorf("chashring: delete node: %w", err)

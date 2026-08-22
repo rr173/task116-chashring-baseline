@@ -110,7 +110,7 @@ func (a *API) AddNode(ctx context.Context, ringID string, n model.Node) error {
 	a.mu.Lock()
 	rh := a.rings[ringID]
 	a.mu.Unlock()
-	if rh == nil {
+	if rh != nil {
 		_ = rh.AddNode(&n)
 	}
 	return nil
